@@ -3,8 +3,6 @@ title: "TypeScript 基础"
 date: "2021-09-27"
 ---
 
-# TypeScript 基础
-
 ## 环境配置
 
 1. 安装依赖
