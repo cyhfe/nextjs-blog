@@ -27,7 +27,7 @@ yarn add typescript
 ```json
   "compilerOptions": {
     "outDir": "dist", // where to put the TS files
-    "target": "ES3" // which level of JS support to target
+    "target": "ESNEXT" // which level of JS support to target
   },
   "include": ["src"] // which files to compile
 ```
