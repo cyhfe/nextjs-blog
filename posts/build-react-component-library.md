@@ -103,20 +103,7 @@ git push
 
 ```bash
 npx sb init
+npm run storybook
 ```
 
-- .storybook
 
-  - main.js (配置文件)
-
-  - preview.js (customize the presentation of components)
-
-src/stories
-
-\*.stories.tsx (component documentation follows this naming convention)
-
-package.json
-
-Storybook dependencies are added
-
-storybook and build-storybook NPM scripts are added
