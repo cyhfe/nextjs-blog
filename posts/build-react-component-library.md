@@ -1,6 +1,6 @@
 ---
-title: 'React组件库环境搭建(开发-打包-发布)'
-date: '2021-09-27'
+title: "React组件库环境搭建"
+date: "2021-09-30"
 ---
 
 包含功能:
@@ -89,7 +89,7 @@ npm install --save-dev @types/react @types/react-dom
 
 ```tsx
 // src/buttons/Button.tsx
-import React from 'react';
+import React from "react";
 
 export const Button = () => {
   return <button>Hello world</button>;
@@ -142,12 +142,12 @@ import README from '../../README.md';
 ```tsx
 // File: src/stories/Button.stories.tsx
 
-import React from 'react';
-import { Story, Meta } from '@storybook/react/types-6-0';
-import { Button } from '../buttons/Button';
+import React from "react";
+import { Story, Meta } from "@storybook/react/types-6-0";
+import { Button } from "../buttons/Button";
 
 export default {
-  title: 'Example/Button',
+  title: "Example/Button",
   component: Button,
 } as Meta;
 
@@ -165,7 +165,7 @@ export const Default = Template.bind({});
 ```js
 // File: .story/preview.js
 
-import 'bootstrap/dist/css/bootstrap-reboot.min.css';
+import "bootstrap/dist/css/bootstrap-reboot.min.css";
 ```
 
 ## prettier
@@ -262,7 +262,7 @@ npm install --save-dev jest@26 ts-jest@26 @types/jest@26
 /* eslint-env node */
 
 module.exports = {
-  preset: 'ts-jest',
+  preset: "ts-jest",
 };
 ```
 
@@ -285,7 +285,7 @@ npm install --save-dev @testing-library/react @testing-library/jest-dom
 ```ts
 // File: jest-setup.ts
 
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
 ```
 
 ```
@@ -346,7 +346,7 @@ module.exports = {
 ```ts
 // File: src/index.ts
 
-export * from './buttons/Button';
+export * from "./buttons/Button";
 ```
 
 ## babel
@@ -401,32 +401,32 @@ npm install --save-dev rollup rollup-plugin-delete rollup-plugin-node-externals 
 
 /* eslint-env node */
 
-import { nodeResolve } from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import babel from '@rollup/plugin-babel';
-import externals from 'rollup-plugin-node-externals';
-import del from 'rollup-plugin-delete';
-import pkg from './package.json';
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import babel from "@rollup/plugin-babel";
+import externals from "rollup-plugin-node-externals";
+import del from "rollup-plugin-delete";
+import pkg from "./package.json";
 
 export default [
   {
-    input: './src/index.ts',
+    input: "./src/index.ts",
     plugins: [
-      del({ targets: 'dist/*' }),
+      del({ targets: "dist/*" }),
       externals({ deps: true }),
       nodeResolve({
-        extensions: ['.js', '.ts', '.tsx'],
+        extensions: [".js", ".ts", ".tsx"],
       }),
       commonjs(),
       babel({
-        babelHelpers: 'runtime',
-        exclude: '**/node_modules/**',
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        babelHelpers: "runtime",
+        exclude: "**/node_modules/**",
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
       }),
     ],
     output: [
-      { file: pkg.main, format: 'cjs' },
-      { file: pkg.module, format: 'es' },
+      { file: pkg.main, format: "cjs" },
+      { file: pkg.module, format: "es" },
     ],
   },
 ];
