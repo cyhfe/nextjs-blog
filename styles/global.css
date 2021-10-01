@@ -8,6 +8,10 @@ body {
   font-size: 18px;
 }
 
+body {
+  overflow-y: scroll;
+}
+
 * {
   box-sizing: border-box;
 }
