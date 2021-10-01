@@ -11,9 +11,9 @@ import Navbar from "../navbar/index.js";
 
 import { css } from "@emotion/react";
 
-export default function Layout({ children }) {
+export default function Layout({ children, ...props }) {
   return (
-    <>
+    <div {...props}>
       <Navbar />
       <div
         css={css`
@@ -23,6 +23,6 @@ export default function Layout({ children }) {
       >
         {children}
       </div>
-    </>
+    </div>
   );
 }
