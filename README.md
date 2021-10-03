@@ -1,1 +1,3 @@
-blog 3
+my [blog](https://chenyuhao.vercel.app/) created by nextjs
+
+
