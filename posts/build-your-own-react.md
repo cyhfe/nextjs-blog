@@ -1,6 +1,6 @@
 ---
 title: "实现一个小而全的react"
-date: "2021-10-5"
+date: "2021-10-6"
 ---
 
 > 行文思路参考https://pomb.us/build-your-own-react/
