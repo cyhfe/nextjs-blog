@@ -58,15 +58,6 @@ yarn dev
 
 可以看到我们的项目跑起来了。
 
-Step I: The createElement Function
-Step II: The render Function
-Step III: Concurrent Mode
-Step IV: Fibers
-Step V: Render and Commit Phases
-Step VI: Reconciliation
-Step VII: Function Components
-Step VIII: Hooks
-
 ## createElement
 
 在我们实现 createElement 之前， 我们需要理解 JSX 是什么。
