@@ -1,5 +1,5 @@
 ---
-title: "Javascript是如何工作的"
+title: "JavaScript 是如何工作的"
 date: "2021-10-05"
 ---
 
