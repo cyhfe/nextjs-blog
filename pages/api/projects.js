@@ -49,8 +49,8 @@ export const projects = [
     title: 'paint',
     description: ['redux', 'canvas', 'react'],
     cover: paintCover,
-    github: 'https://github.com/cyhfe/pong',
-    demo: 'https://cyhfe.github.io/pong/',
+    github: 'https://github.com/cyhfe/redux-paint',
+    demo: 'https://cyh-paint.herokuapp.com/',
   },
   {
     id: 5,
