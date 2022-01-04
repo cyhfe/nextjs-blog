@@ -1,21 +1,41 @@
-import Image from "next/image";
-import trelloImg from "../../public/images/trello-clone.png";
+import Image from 'next/image';
 
-import * as React from "react";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Typography from "@mui/material/Typography";
-import { Button, CardActionArea, CardActions, Stack } from "@mui/material";
+import * as React from 'react';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
+import { Button, CardActionArea, CardActions, Stack } from '@mui/material';
 
-export default function MultiActionAreaCard() {
+export default function MultiActionAreaCard({
+  title,
+  description = [],
+  cover,
+  github,
+  demo,
+}) {
   return (
-    <Stack alignItems="center">
+    <Stack alignItems="center" mt={6}>
       <Card sx={{ maxWidth: 960 }}>
         <CardActionArea>
-          <Image src={trelloImg}></Image>
+          <Image src={cover}></Image>
           <CardContent>
-            <Typography gutterBottom variant="h5" component="div">
+            {
+              <Typography gutterBottom variant="h5" component="div">
+                {title}
+              </Typography>
+            }
+            {description.map((t, index) => (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                gutterBottom
+                key={index}
+              >
+                {t}
+              </Typography>
+            ))}
+            {/* <Typography gutterBottom variant="h5" component="div">
               Trello Clone
             </Typography>
             <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -29,20 +49,15 @@ export default function MultiActionAreaCard() {
             </Typography>
             <Typography variant="body2" color="text.secondary" gutterBottom>
               自定义拖拽图层
-            </Typography>
+            </Typography> */}
           </CardContent>
         </CardActionArea>
         <CardActions>
-          <Button
-            size="large"
-            color="primary"
-            href="https://github.com/cyhfe/trello-clone.git"
-            target="_blank"
-          >
+          <Button size="large" color="primary" href={github} target="_blank">
             GITHUB
           </Button>
-          <Button size="large" color="secondary">
-            在线DEMO
+          <Button size="large" color="secondary" href={demo} target="_blank">
+            在线演示
           </Button>
         </CardActions>
       </Card>
