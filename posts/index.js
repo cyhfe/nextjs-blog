@@ -1,20 +1,48 @@
-const { set } = require("date-fns")
+class Pubsub {
+  constructor() {
+    this.eventBus = {};
+  }
 
-const person = {
-  name: "john",
-  age: 18
+  subscribe(event, fn) {
+    if (!this.eventBus[event]) {
+      this.eventBus[event] = [];
+    }
+    this.eventBus[event].push(fn);
+  }
+
+  unsubscribe(event, fn) {
+    if (this.eventBus[event]) return false;
+    this.eventBus[event].filter((f) => f !== fn);
+  }
+
+  publish(event, data) {
+    if (!this.eventBus[event]) return false;
+    this.eventBus[event].forEach((fn) => fn(data));
+  }
 }
 
-const personProxy = new Proxy(person, {
-    get: (obj, prop) => {
-        console.log(`the value of ${prop} is ${Reflect.get(obj, prop)}`)
-    },
-    set: (obj, prop, value) => {
-        console.log(`Changed ${prop} from ${obj[prop]} to ${value}`);
-        return Reflect.set(obj, prop, value)
-    }
-})
+const pubsub = new Pubsub();
 
-personProxy.name;
-personProxy.age = 43;
-personProxy.name = "Jane Doe";
+const eat = function () {
+  console.log("I am eating");
+};
+
+const drink = function () {
+  console.log("I am drinking");
+};
+const running = function () {
+  console.log("I am running");
+};
+
+pubsub.subscribe("dinner", eat);
+pubsub.subscribe("dinner", drink);
+pubsub.subscribe("sports", running);
+
+pubsub.publish("dinner");
+// should log
+// I am drinking
+// I am eating
+
+pubsub.publish("sports");
+// should log
+// I am running
