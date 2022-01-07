@@ -94,3 +94,59 @@
 // console.log(onceFunc(4)); // => should log 6
 // console.log(onceFunc(10)); // => should log 6
 // console.log(onceFunc(9001)); // => should log 6
+
+// CHALLENGE 5
+// Write a function after that takes the number of times the callback needs to be called before being executed as the first parameter and the callback as the second parameter.
+// function after(count, func) {
+//   let calledTime = 0;
+//   return function () {
+//     calledTime++;
+//     if (calledTime >= count) {
+//       func();
+//     }
+//   };
+// }
+
+// // /*** Uncomment these to check your work! ***/
+// const called = function () {
+//   console.log("hello");
+// };
+// const afterCalled = after(3, called);
+// afterCalled(); // => nothing is printed
+// afterCalled(); // => nothing is printed
+// afterCalled(); // => 'hello' is printed
+
+// Challenge 6
+// Write a function delay that accepts a callback as the first parameter and the wait in milliseconds before allowing the callback to be invoked as the second parameter.
+//  Any additional arguments after wait are provided to func when it is invoked. HINT: research setTimeout();
+
+// function delay(func, wait, ...rest) {
+//   setTimeout(() => {
+//     func(...rest);
+//   }, wait);
+// }
+
+// Challenge 7
+// Write a function rollCall that accepts an array of names and returns a function.
+// The first time the returned function is invoked, it should log the first name to the console.
+// The second time it is invoked, it should log the second name to the console, and so on, until all names have been called.
+// Once all names have been called, it should log 'Everyone accounted for'.
+
+// function rollCall(names) {
+//   let count = 0;
+//   let len = names.length;
+//   return function () {
+//     if (count < len) {
+//       console.log(names[count]);
+//     } else {
+//       console.log("Everyone accounted for");
+//     }
+//     count++;
+//   };
+// }
+
+// const rollCaller = rollCall(["Victoria", "Juan", "Ruth"]);
+// rollCaller(); // => should log 'Victoria'
+// rollCaller(); // => should log 'Juan'
+// rollCaller(); // => should log 'Ruth'
+// rollCaller(); // => should log 'Everyone accounted for'
