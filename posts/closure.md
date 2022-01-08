@@ -5,6 +5,26 @@ date: "2022-01-07"
 
 # 闭包练习
 
+## 如何理解闭包
+
+```javascript
+let a = 2;
+function outer() {
+  let a = 1;
+  return function inner() {
+    console.log(a);
+  };
+}
+debugger;
+const inner = outer();
+inner();
+```
+
+函数退出后，返回的函数通过变量保存在外部。这个返回的函数会保存当时的变量环境，这就是闭包。
+闭包保存在 heap（内存）中，而不是 stack（调用栈）中。
+
+![closure](/image/closure/closure.png)
+
 [http://csbin.io/closures](http://csbin.io/closures)
 
 ```javascript
