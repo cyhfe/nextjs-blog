@@ -4,7 +4,9 @@ date: "2022-01-08"
 ---
 
 纯函数：稳定输入输出，没有副作用
+
 副作用：所有影响函数外部的操作，或者 Math.random 这种不确定的操作
+
 不可变: 解构，object.assign, concat 等
 
 ## curry
