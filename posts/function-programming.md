@@ -1,5 +1,5 @@
 ---
-title: "函数式编程"
+title: "函数式编程: curry compose"
 date: "2022-01-08"
 ---
 
