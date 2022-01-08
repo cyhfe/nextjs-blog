@@ -73,3 +73,139 @@ setNumber((n) => n + 1);
 ｜n =>   ｜ n + 1	｜2	 ｜2 + 1 = 3
 
 ```
+
+## diff
+
+于是 React 在以下两个假设的基础之上提出了一套 O(n) 的启发式算法：
+
+1. 两个不同类型的元素会产生出不同的树；
+2. 开发者可以通过设置 key 属性，来告知渲染哪些子元素在不同的渲染下可以保存不变；
+
+- 不同类型的元素: 销毁替换
+- 同一类型的元素： React 会保留 DOM 节点，仅比对及更新有改变的属性
+
+## hook flow
+
+![https://raw.githubusercontent.com/donavon/hook-flow/master/hook-flow.png](https://raw.githubusercontent.com/donavon/hook-flow/master/hook-flow.png)
+
+```javascript
+import * as React from "react";
+
+function Child() {
+  console.log("%c    Child: render start", "color: MediumSpringGreen");
+
+  const [count, setCount] = React.useState(() => {
+    console.log("%c    Child: useState(() => 0)", "color: tomato");
+    return 0;
+  });
+
+  React.useEffect(() => {
+    console.log("%c    Child: useEffect(() => {})", "color: LightCoral");
+    return () => {
+      console.log(
+        "%c    Child: useEffect(() => {}) cleanup 🧹",
+        "color: LightCoral"
+      );
+    };
+  });
+
+  React.useEffect(() => {
+    console.log(
+      "%c    Child: useEffect(() => {}, [])",
+      "color: MediumTurquoise"
+    );
+    return () => {
+      console.log(
+        "%c    Child: useEffect(() => {}, []) cleanup 🧹",
+        "color: MediumTurquoise"
+      );
+    };
+  }, []);
+
+  React.useEffect(() => {
+    console.log("%c    Child: useEffect(() => {}, [count])", "color: HotPink");
+    return () => {
+      console.log(
+        "%c    Child: useEffect(() => {}, [count]) cleanup 🧹",
+        "color: HotPink"
+      );
+    };
+  }, [count]);
+
+  const element = (
+    <button onClick={() => setCount((previousCount) => previousCount + 1)}>
+      {count}
+    </button>
+  );
+
+  console.log("%c    Child: render end", "color: MediumSpringGreen");
+
+  return element;
+}
+
+function App() {
+  console.log("%cApp: render start", "color: MediumSpringGreen");
+
+  const [showChild, setShowChild] = React.useState(() => {
+    console.log("%cApp: useState(() => false)", "color: tomato");
+    return false;
+  });
+
+  React.useEffect(() => {
+    console.log("%cApp: useEffect(() => {})", "color: LightCoral");
+    return () => {
+      console.log("%cApp: useEffect(() => {}) cleanup 🧹", "color: LightCoral");
+    };
+  });
+
+  React.useEffect(() => {
+    console.log("%cApp: useEffect(() => {}, [])", "color: MediumTurquoise");
+    return () => {
+      console.log(
+        "%cApp: useEffect(() => {}, []) cleanup 🧹",
+        "color: MediumTurquoise"
+      );
+    };
+  }, []);
+
+  React.useEffect(() => {
+    console.log("%cApp: useEffect(() => {}, [showChild])", "color: HotPink");
+    return () => {
+      console.log(
+        "%cApp: useEffect(() => {}, [showChild]) cleanup 🧹",
+        "color: HotPink"
+      );
+    };
+  }, [showChild]);
+
+  const element = (
+    <>
+      <label>
+        <input
+          type="checkbox"
+          checked={showChild}
+          onChange={(e) => setShowChild(e.target.checked)}
+        />{" "}
+        show child
+      </label>
+      <div
+        style={{
+          padding: 10,
+          margin: 10,
+          height: 50,
+          width: 50,
+          border: "solid",
+        }}
+      >
+        {showChild ? <Child /> : null}
+      </div>
+    </>
+  );
+
+  console.log("%cApp: render end", "color: MediumSpringGreen");
+
+  return element;
+}
+
+export default App;
+```
