@@ -23,7 +23,7 @@ inner();
 函数退出后，返回的函数通过变量保存在外部。这个返回的函数会保存当时的变量环境，这就是闭包。
 闭包保存在 heap（内存）中，而不是 stack（调用栈）中。
 
-![closure](/image/closure/closure.png)
+![closure](/images/closure/closure.png)
 
 [http://csbin.io/closures](http://csbin.io/closures)
 
