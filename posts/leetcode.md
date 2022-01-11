@@ -1,5 +1,5 @@
 ---
-title: "LeetCode日记"
+title: "LeetCode"
 date: "2022-01-11"
 ---
 
@@ -33,7 +33,7 @@ function twoSum(nums: number[], target: number): number[] {
 
 2. 两数相加
 
-```typescriptKv
+```typescript
 // 两数相加
 class ListNode {
   val: number;
