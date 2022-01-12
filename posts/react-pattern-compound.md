@@ -177,7 +177,203 @@ function useToggle() {
   >
     {on ? "on" : "off"}
   </button>
-</div>
+</div>;
 
 // 实现
+const callAll =
+  (...fns) =>
+  (...arg) =>
+    fns.forEach((fn) => typeof fn === "function" && fn(...arg));
+
+function useToggle() {
+  const [on, setOn] = React.useState(false);
+  const toggle = () => setOn(!on);
+  function getTogglerProps({ onClick, ...props } = {}) {
+    return {
+      "aria-pressed": on,
+      onClick: callAll(onClick, toggle),
+      ...props,
+    };
+  }
+  return {
+    on,
+    toggle,
+    getTogglerProps,
+  };
+}
+
+function App() {
+  const { on, getTogglerProps } = useToggle();
+  return (
+    <div>
+      <Switch
+        {...getTogglerProps({
+          on,
+        })}
+      />
+      <hr />
+      <button
+        aria-label="custom-button"
+        {...getTogglerProps({
+          "aria-label": "custom-button",
+          onClick: () => console.info("onButtonClick"),
+          id: "custom-button-id",
+        })}
+      >
+        {on ? "on" : "off"}
+      </button>
+    </div>
+  );
+}
+```
+
+## reducer 反转控制
+
+```jsx
+// 之前文章提过的反转控制。如果我们希望Toggle加一个功能，超过4次就不能再toggle了。
+// 按反转控制的思路，要把这个逻辑交给用户去做。所以我们用reducer重构一下组件
+
+const callAll =
+  (...fns) =>
+  (...arg) =>
+    fns.forEach((fn) => typeof fn === "function" && fn(...arg));
+
+const actionTypes = {
+  on: "ON",
+  off: "OFF",
+  toggle: "TOGGLE",
+  reset: "RESET",
+};
+
+function init(value) {
+  return { on: value };
+}
+
+const toggleReducer = (state, { type, payload }) => {
+  switch (type) {
+    case actionTypes.on:
+      return { ...state, on: true };
+    case actionTypes.off:
+      return { ...state, on: false };
+    case actionTypes.toggle:
+      return { ...state, on: !state.on };
+    case actionTypes.reset:
+      return init(payload);
+    default:
+      throw new Error(`Unsupported type: ${type}`);
+  }
+};
+
+function useToggle({ reducer = toggleReducer, initial = false } = {}) {
+  const [{ on }, dispatch] = React.useReducer(reducer, initial, init);
+  const toggle = () => dispatch({ type: actionTypes.toggle });
+  const reset = () => dispatch({ type: actionTypes.reset, payload: initial });
+  function getTogglerProps({ onClick, ...props } = {}) {
+    return {
+      "aria-pressed": on,
+      onClick: callAll(onClick, toggle),
+      ...props,
+    };
+  }
+  function getResetterProps({ onClick, ...props } = {}) {
+    return {
+      "aria-label": "reset",
+      onClick: callAll(onClick, reset),
+      ...props,
+    };
+  }
+  return {
+    on,
+    toggle,
+    getTogglerProps,
+    getResetterProps,
+  };
+}
+
+function App() {
+  const [count, setCount] = React.useState(0);
+  const clickedTooMuch = count > 4;
+  const { on, getTogglerProps, getResetterProps } = useToggle({
+    reducer: toggleStateReducer,
+  });
+
+  function toggleStateReducer(state, action) {
+    if (action.type === actionTypes.toggle && clickedTooMuch) {
+      return state;
+    }
+    return toggleReducer(state, action);
+  }
+  return (
+    <div>
+      {clickedTooMuch ? <div>you clicked too much</div> : <div>{count}</div>}
+      <Switch
+        {...getTogglerProps({
+          on,
+          onClick: () => setCount(count + 1),
+        })}
+      />
+      <hr />
+      <button
+        {...getResetterProps({
+          onClick: () => setCount(0),
+        })}
+      >
+        reset
+      </button>
+    </div>
+  );
+}
+
+export default App;
+```
+
+## 属性控制
+
+```jsx
+// 再来想想另一种用例：
+// 我希望Toggle的状态不但可以自己管理，可以通过外部来控制。
+function App() {
+  const [bothOn, setBothOn] = React.useState(false);
+  const [timesClicked, setTimesClicked] = React.useState(0);
+
+  function handleToggleChange(state, action) {
+    if (action.type === actionTypes.toggle && timesClicked > 4) {
+      return;
+    }
+    setBothOn(state.on);
+    setTimesClicked((c) => c + 1);
+  }
+
+  function handleResetClick() {
+    setBothOn(false);
+    setTimesClicked(0);
+  }
+
+  return (
+    <div>
+      <div>
+        <Toggle on={bothOn} onChange={handleToggleChange} />
+        <Toggle on={bothOn} onChange={handleToggleChange} />
+      </div>
+      {timesClicked > 4 ? (
+        <div data-testid="notice">
+          Whoa, you clicked too much!
+          <br />
+        </div>
+      ) : (
+        <div data-testid="click-count">Click count: {timesClicked}</div>
+      )}
+      <button onClick={handleResetClick}>Reset</button>
+      <hr />
+      <div>
+        <div>Uncontrolled Toggle:</div>
+        <Toggle
+          onChange={(...args) =>
+            console.info("Uncontrolled Toggle onChange", ...args)
+          }
+        />
+      </div>
+    </div>
+  );
+}
 ```
