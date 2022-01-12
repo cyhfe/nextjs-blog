@@ -377,3 +377,64 @@ function App() {
   );
 }
 ```
+
+```jsx
+function Toggle({on: controlledOn, onChange}) {
+  const {on, getTogglerProps} = useToggle({on: controlledOn, onChange})
+  const props = getTogglerProps({on})
+  return <Switch {...props} />
+}
+
+function useToggle({
+  initialOn = false,
+  reducer = toggleReducer,
+  onChange,
+  on: controlledOn,
+} = {}) {
+  const {current: initialState} = React.useRef({on: initialOn})
+  const [state, dispatch] = React.useReducer(reducer, initialState)
+  // controlled: 有传on, 外部状态.否则使用内部状态
+  const onIsControlled = controlledOn != null
+  const on = onIsControlled ? controlledOn : state.on
+
+  function dispatchWithOnChange(action) {
+    // 内部状态直接dispatch
+    if (!onIsControlled) {
+      dispatch(action)
+    }
+
+    // 外部状态通过reducer返回新状态交给onChange处理
+    const newState = reducer({...state, on}, action)
+    onChange?.(newState, action)
+  }
+
+  const toggle = () => dispatchWithOnChange({type: actionTypes.toggle})
+  const reset = () =>
+    dispatchWithOnChange({type: actionTypes.reset, initialState})
+
+  function getTogglerProps({onClick, ...props} = {}) {
+    return {
+      'aria-pressed': on,
+      onClick: callAll(onClick, toggle),
+      ...props,
+    }
+  }
+
+  function getResetterProps({onClick, ...props} = {}) {
+    return {
+      onClick: callAll(onClick, reset),
+      ...props,
+    }
+  }
+
+  return {
+    on,
+    reset,
+    toggle,
+    getTogglerProps,
+    getResetterProps,
+  }
+}
+
+
+```
