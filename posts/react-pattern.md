@@ -1,6 +1,6 @@
 ---
-title: "React设计模式"
-date: "2022-01-08"
+title: "React组件设计：反转控制"
+date: "2022-01-12"
 ---
 
 [advanced-react-patterns](https://github.com/kentcdodds/advanced-react-patterns)
@@ -18,7 +18,7 @@ date: "2022-01-08"
 3. 实现逻辑复杂
 4. api 繁琐
 
-什么是反转控制： 让你的抽象做更少的事情，让你的用户去做
+什么是反转控制： 抽象做更少的事情，交给用户去做
 
 这里举个例子
 
@@ -154,3 +154,91 @@ function App() {
 ```
 
 这里要注意的关键是组件的用户看不到任何状态。状态在这些组件之间隐式共享。这是复合组件模式的主要价值。通过使用该功能，我们为组件的用户提供了一些渲染控制，现在在其中添加额外的内容非常简单和直观。无需查找 API 文档，也无需添加额外的功能、代码或测试。
+
+## The State Reducer Pattern
+
+`useToggle`自定义 hook 默认 reducer， 用户可以传递新的 reducer 添加逻辑。
+直接上代码
+
+```jsx
+import React from "react";
+import ReactDOM from "react-dom";
+import Switch from "./switch";
+
+const actionTypes = {
+  toggle: "TOGGLE",
+  on: "ON",
+  off: "OFF",
+};
+
+function toggleReducer(state, action) {
+  switch (action.type) {
+    case actionTypes.toggle: {
+      return { on: !state.on };
+    }
+    case actionTypes.on: {
+      return { on: true };
+    }
+    case actionTypes.off: {
+      return { on: false };
+    }
+    default: {
+      throw new Error(`Unhandled type: ${action.type}`);
+    }
+  }
+}
+
+function useToggle({ reducer = toggleReducer } = {}) {
+  const [{ on }, dispatch] = React.useReducer(reducer, { on: false });
+
+  const toggle = () => dispatch({ type: actionTypes.toggle });
+  const setOn = () => dispatch({ type: actionTypes.on });
+  const setOff = () => dispatch({ type: actionTypes.off });
+
+  return { on, toggle, setOn, setOff };
+}
+
+// export {useToggle, actionTypes, toggleReducer, actionTypes}
+
+function Toggle() {
+  const [clicksSinceReset, setClicksSinceReset] = React.useState(0);
+  const tooManyClicks = clicksSinceReset >= 4;
+
+  const { on, toggle, setOn, setOff } = useToggle({
+    // 让用户自定义reducer
+    reducer(currentState, action) {
+      const changes = toggleReducer(currentState, action);
+      if (tooManyClicks && action.type === actionTypes.toggle) {
+        // other changes are fine, but on needs to be unchanged
+        return { ...changes, on: currentState.on };
+      } else {
+        // the changes are fine
+        return changes;
+      }
+    },
+  });
+
+  return (
+    <div>
+      <button onClick={setOff}>Switch Off</button>
+      <button onClick={setOn}>Switch On</button>
+      <Switch
+        onClick={() => {
+          toggle();
+          setClicksSinceReset((count) => count + 1);
+        }}
+        on={on}
+      />
+      {tooManyClicks ? (
+        <button onClick={() => setClicksSinceReset(0)}>Reset</button>
+      ) : null}
+    </div>
+  );
+}
+
+function App() {
+  return <Toggle />;
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
+```
