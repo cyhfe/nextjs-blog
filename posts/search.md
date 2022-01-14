@@ -65,3 +65,9 @@ function search(nums, start, end, target) {
   }
 }
 ```
+
+## BFS V DFS
+
+BFS(内存大) DFS(时间长)
+
+具体实现在数据结构那篇博客
