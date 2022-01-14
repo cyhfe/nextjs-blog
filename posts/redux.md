@@ -7,79 +7,56 @@ date: "2022-01-08"
 
 ![https://d33wubrfki0l68.cloudfront.net/01cc198232551a7e180f4e9e327b5ab22d9d14e7/b33f4/assets/images/reduxdataflowdiagram-49fa8c3968371d9ef6f2a1486bd40a26.gif](https://d33wubrfki0l68.cloudfront.net/01cc198232551a7e180f4e9e327b5ab22d9d14e7/b33f4/assets/images/reduxdataflowdiagram-49fa8c3968371d9ef6f2a1486bd40a26.gif)
 
-## 简单实现
+## 精简实现
 
-```javascript
-function createStore(recuder, preloadState, enhancer){
+```js
+function createStore(reducer, preloadState, enhancer) {
   if (typeof enhancer === "function") {
     return enhancer(createStore)(reducer, preloadState)
   }
-  let currentState = preloadedState
-  let listeners: []
+  let currentState = preloadState
+  let listeners = []
 
-  return {
-      getState(){
-          return currentState
-      }
-      dispatch(action){
-          currentState = reducer(currentState, action)
-          // 每次状态更新， 通知subscribers(观察者模式)
-          listeners.forEach(fn => fn())
-      }
-      subscribe(newListener){
-          listeners.push(newListener);
-          const unsubscribe = () => {
-            listeners = listeners.filter((l) => l !== newListener);
-          };
-
-          return unsubscribe;
-      }
-  }
-}
-
-```
-
-```javascript
-// 中间件
-const asyncFunctionMiddleware = (storeAPI) => (next) => (action) => {
-  // If the "action" is actually a function instead...
-  if (typeof action === "function") {
-    // then call the function and pass `dispatch` and `getState` as arguments
-    return action(storeAPI.dispatch, storeAPI.getState)
+  function getState() {
+    return currentState
   }
 
-  // Otherwise, it's a normal action - send it onwards
-  return next(action)
-}
-```
+  function subscribe(listener) {
+    listeners.push(listener)
+    return function unsubscribe() {
+      listeners.filter((l) => l !== listener)
+    }
+  }
 
-```javascript
-// async
-const fetchSomeData = (dispatch, getState) => {
-  // Make an async HTTP request
-  client.get("todos").then((todos) => {
-    // Dispatch an action with the todos we received
-    dispatch({ type: "todos/todosLoaded", payload: todos })
-    // Check the updated store state after dispatching
-    const allTodos = getState().todos
-    console.log("Number of todos after loading: ", allTodos.length)
+  function dispatch(action) {
+    currentState = reducer(currentState, action)
+    listeners.forEach((l) => l())
+    return action
+  }
+
+  const store = {
+    getState,
+    subscribe,
+    dispatch,
+  }
+
+  return store
+}
+
+function compose(...funcs) {
+  if (funcs.length === 0) {
+    return (arg) => arg
+  }
+
+  if (funcs.length === 1) {
+    return funcs[0]
+  }
+  return funcs.reduce((a, b) => (...args) => {
+    return a(b(...args))
   })
 }
 
-// Pass the _function_ we wrote to `dispatch`
-store.dispatch(fetchSomeData)
-```
-
-```js
-function compose(...funcs) {
-  return funcs.reduce(
-    (acc, cur) =>
-      (...args) =>
-        acc(cur(...args))
-  )
-}
-
-function applayMiddleware(...middleware) {
+function applayMiddleware(...middlewares) {
   return (createStore) => (reducer, preloadState) => {
     const store = createStore(reducer, preloadState)
 
@@ -98,6 +75,7 @@ function applayMiddleware(...middleware) {
     const chain = middlewares.map((middleware) => middleware(middlewareAPI))
     // 当调用dispatch时，调用所有中间间
     dispatch = compose(...chain)(store.dispatch)
+
     return {
       ...store,
       dispatch,
@@ -105,20 +83,98 @@ function applayMiddleware(...middleware) {
   }
 }
 
-// function logger({ getState, dispatch }) {
-//   return next(store.dispatch) => action => {
-//     console.log('will dispatch', action)
+function logger({ getState }) {
+  // dispatch({ type: "add" })
+  // 不能在这里调dispatch
 
-//     // Call the next dispatch method in the middleware chain.
-//     const returnValue = next(action)
+  // (store.dispatch)
+  return (next) => (action) => {
+    console.log("will dispatch", action)
 
-//     console.log('state after dispatch', getState())
+    // Call the next dispatch method in the middleware chain.
+    const returnValue = next(action)
 
-//     // This will likely be the action itself, unless
-//     // a middleware further in chain changed it.
-//     return returnValue
-//   }
+    console.log("state after dispatch", getState())
+
+    // This will likely be the action itself, unless
+    // a middleware further in chain changed it.
+    return returnValue
+  }
+}
+
+const asyncFunctionMiddleware = (storeAPI) => (next) => (action) => {
+  // If the "action" is actually a function instead...
+  if (typeof action === "function") {
+    // then call the function and pass `dispatch` and `getState` as arguments
+    return action(storeAPI.dispatch, storeAPI.getState)
+  }
+
+  // Otherwise, it's a normal action - send it onwards
+  return next(action)
+}
+
+function reducer(state = 0, action) {
+  switch (action.type) {
+    case "add": {
+      return ++state
+    }
+    default: {
+      return state
+    }
+  }
+}
+
+const store = createStore(
+  reducer,
+  0,
+  applayMiddleware(asyncFunctionMiddleware, logger)
+)
+
+store.subscribe(() => {
+  console.log(store.getState())
+})
+
+// store.dispatch({ type: "add" })
+
+function asyncDispatch(dispatch) {
+  setTimeout(() => {
+    dispatch({ type: "add" })
+  }, 3000)
+}
+
+store.dispatch(asyncDispatch)
+
+// function foo() {
+//   console.log("foo")
 // }
 
-// const store = createStore(todos, ['Use Redux'], applyMiddleware(logger))
+// function bar() {
+//   console.log("bar")
+// }
+
+// function baz() {
+//   console.log("baz")
+//   console.log(arguments)
+// }
+
+// let r = compose(foo, bar, baz)
+
+// r()
+
+// const compose =
+//   (...funcs) =>
+//   (x) =>
+//     functions.reduceRight((acc, fn) => fn(acc), x);
+// const user = { name: "Gianmarco", password: 1234 }
+// const getUserName = (user) => {
+//   console.log("name")
+//   return user.name
+// }
+// const upperCase = (string) => {
+//   console.log("up")
+//   return string.toUpperCase()
+// }
+// const firstFour = (string) => string.substring(0, 4)
+// let r = compose(firstFour, upperCase, getUserName)(user)
+// console.log(r)
 ```
