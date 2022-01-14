@@ -64,3 +64,9 @@ webpack(
 ```
 
 ## webpack from scratch
+
+## //todo
+
+看完视频及文档，觉得 webpack 是个需要实践的东西，没有必要记些配置。
+
+等有空看下实现再来补充吧。
