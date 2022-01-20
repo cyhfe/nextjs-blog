@@ -189,10 +189,11 @@ function CountProvider(props) {
 ## code splitting
 
 ```jsx
+
 // 按需加载 + prefetch
 const Globe = React.lazy(() => import(/* webpackPrefetch: true */ '../globe'))
 
-        <React.Suspense fallback={<div>loading globe...</div>}>
-          {showGlobe ? <Globe /> : null}
-        </React.Suspense>
+<React.Suspense fallback={<div>loadglobe...</div>}>
+  {showGlobe ? <Globe /> : null}
+</React.Suspense>
 ```
