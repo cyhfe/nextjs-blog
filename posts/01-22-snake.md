@@ -1,3 +1,8 @@
+---
+title: "canvas实现贪食蛇"
+date: "2022-01-22"
+---
+
 # 贪食蛇
 
 最近 dan 有在油管上[直播](https://www.youtube.com/c/DanAbramov8),播放量最多的就是手写一个贪食蛇。
